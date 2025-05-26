@@ -1,63 +1,44 @@
 class Solution {
-    static int parent[];
-
     public boolean equationsPossible(String[] equations) {
-        parent = new int[26];
+        int parent[] = new int[26];
         int rank[] = new int[26];
-        for (int i = 0; i < 26; i++)
-            parent[i] = i;
+        for(int i=0;i<26;i++)parent[i] = i;
 
-        for (String s : equations) {
-            int x = s.charAt(0) - 'a';
-            int y = s.charAt(3) - 'a';
+        for(int i=0;i<equations.length;i++){
+            int x = equations[i].charAt(0) - 'a';
+            int y = equations[i].charAt(3) - 'a';
 
-            char sign = s.charAt(1);
-
-            if (sign == '=')
-                union(x, y, rank);
+            if(equations[i].charAt(1) == '=')
+            union(x,y,parent,rank);
         }
-        for (String s : equations) {
-            if (s.charAt(1) == '!') {
-                int a = s.charAt(0) - 'a';
-                int b = s.charAt(3) - 'a';
-                if (checkConnection(a, b)) // belong to same parent then can't exist in != 
-                    return false;
+
+         for(int i=0;i<equations.length;i++){
+            int x = equations[i].charAt(0) - 'a';
+            int y = equations[i].charAt(3) - 'a';
+
+            if(equations[i].charAt(1) == '!'){
+                if(find(x,parent) == find(y,parent)) return false;
             }
         }
         return true;
     }
 
-    static int find(int x) {
-        if (parent[x] == x)
-            return x;
-        else
-            return parent[x] = find(parent[x]);
+    int find(int x, int parent[]){
+        if(x == parent[x]) return x;
+        return parent[x] = find(parent[x],parent);
     }
 
-    static void union(int x, int y, int rank[]) {
-        int parent_x = find(x);
-        int parent_y = find(y);
+    void union(int x, int y, int parent[],int rank[]){
+        int x_parent = find(x,parent);
+        int y_parent = find(y,parent);
 
-        if (parent_x == parent_y)
-            return;
-        else {
-            if (rank[parent_x] > rank[parent_y])
-                parent[parent_y] = parent_x;
-            else if (rank[parent_x] < rank[parent_y])
-                parent[parent_x] = parent_y;
-            else {
-                parent[parent_x] = parent_y;
-                rank[parent_y]++;
-            }
+        if(rank[x_parent] > rank[y_parent])
+        parent[y_parent] = x_parent;
+        else if(rank[x_parent] < rank[y_parent])
+        parent[x_parent] = y_parent;
+        else{
+            parent[x_parent] = y_parent;
+            rank[y_parent]++;
         }
-    }
-
-    static boolean checkConnection(int x,int y) {
-        int parent_x = find(x);
-        int parent_y = find(y);
-
-        if (parent_x == parent_y)
-            return true;
-        return false;
     }
 }
